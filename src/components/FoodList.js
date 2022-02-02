@@ -5,7 +5,9 @@ function formatDate(value) {
   return `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()}`;
 }
 
-function FoodListItem({ item }) {
+function FoodListItem({ item, onDelete }) {
+  const handleDeleteClick = () => onDelete(item.id);
+
   const { imgUrl, title, calorie, content, createdAt } = item;
 
   return (
@@ -15,17 +17,18 @@ function FoodListItem({ item }) {
       <div>{calorie}</div>
       <div>{content}</div>
       <div>{formatDate(createdAt)}</div>
+      <button onClick={handleDeleteClick}>삭제</button>
     </div>
   );
 }
 
-function FoodList({ items }) {
+function FoodList({ items, onDelete }) {
   return (
     <ul>
       {items.map((item) => {
         return (
           <li>
-            <FoodListItem item={item} />
+            <FoodListItem item={item} onDelete={onDelete} />
           </li>
         );
       })}
