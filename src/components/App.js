@@ -6,6 +6,8 @@ function App() {
   const [items, setItems] = useState([]);
   const [order, setOrder] = useState("createdAt");
   const [cursor, setCursor] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingError, setLoadingError] = useState(null);
 
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
 
@@ -18,10 +20,21 @@ function App() {
   };
 
   const handleLoad = async (options) => {
+    let result;
+    try {
+      setIsLoading(true);
+      setLoadingError(null);
+      result = await getFoods(options);
+    } catch (error) {
+      setLoadingError(error);
+      return;
+    } finally {
+      setIsLoading(false);
+    }
     const {
       foods,
       paging: { nextCursor },
-    } = await getFoods(options);
+    } = result;
     if (!options.cursor) {
       setItems(foods);
     } else {
@@ -48,7 +61,12 @@ function App() {
       <button onClick={handleNewestClick}>최신순</button>
       <button onClick={handleKCalClick}>칼로리순</button>
       <FoodList items={sortedItems} onDelete={handleDelete} />
-      {cursor && <button onClick={handleLoadMore}>더 보기</button>}
+      {cursor && (
+        <button disabled={isLoading} onClick={handleLoadMore}>
+          더 보기
+        </button>
+      )}
+      {loadingError?.message && <span>{loadingError.message}</span>}
     </div>
   );
 }
