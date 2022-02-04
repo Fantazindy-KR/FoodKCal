@@ -10,7 +10,7 @@ function Foodform() {
   };
 
   const handleCalorieChange = (e) => {
-    const nextCalorie = Number(e.target.value);
+    const nextCalorie = Number(e.target.value) || 0;
     setCalorie(nextCalorie);
   };
 
