@@ -20,9 +20,14 @@ function Foodform() {
 
   return (
     <form>
-      <input value={title} onChange={handleTitleChange} />
-      <input type="number" value={calorie} onChange={handleCalorieChange} />
-      <textarea value={content} onChange={handleContentChange} />
+      <input name="title" value={title} onChange={handleTitleChange} />
+      <input
+        name="calorie"
+        type="number"
+        value={calorie}
+        onChange={handleCalorieChange}
+      />
+      <textarea name="content" value={content} onChange={handleContentChange} />
     </form>
   );
 }
