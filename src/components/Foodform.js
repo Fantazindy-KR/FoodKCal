@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { createFood } from "../api";
 import FileInput from "./FileInput";
 
 function sanitize(type, value) {
@@ -19,8 +18,14 @@ const INITIAL_VALUES = {
   imgFile: null,
 };
 
-function Foodform({ onSubmitSuccess }) {
-  const [values, setValues] = useState(INITIAL_VALUES);
+function Foodform({
+  initialValues = INITIAL_VALUES,
+  initialPreview,
+  onSubmit,
+  onSubmitSuccess,
+  onCancel,
+}) {
+  const [values, setValues] = useState(initialValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingError, setSubmittingError] = useState(null);
 
@@ -48,7 +53,7 @@ function Foodform({ onSubmitSuccess }) {
     try {
       setSubmittingError(null);
       setIsSubmitting(true);
-      result = await createFood(formData);
+      result = await onSubmit(formData);
     } catch (error) {
       setSubmittingError(error);
       return;
@@ -57,8 +62,8 @@ function Foodform({ onSubmitSuccess }) {
     }
     //food여야만 하는 이유는 api라는 서버에서 food라는 프로퍼티 이름으로 사용하고 있기 때문
     const { food } = result;
-    onSubmitSuccess(food);
     setValues(INITIAL_VALUES);
+    onSubmitSuccess(food);
   };
 
   return (
@@ -67,6 +72,7 @@ function Foodform({ onSubmitSuccess }) {
         name="imgFile"
         value={values.imgFile}
         onChange={handleChange}
+        initialPreview={initialPreview}
       />
       <input name="title" value={values.title} onChange={handleInputChange} />
       <input
@@ -80,6 +86,7 @@ function Foodform({ onSubmitSuccess }) {
         value={values.content}
         onChange={handleInputChange}
       />
+      {onCancel && <button onClick={onCancel}>취소</button>}
       <button type="submit" disabled={isSubmitting}>
         확인
       </button>
