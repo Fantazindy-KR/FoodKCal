@@ -58,6 +58,10 @@ function App() {
     setSearch(e.target["search"].value);
   };
 
+  const handleSubmitSuccess = (review) => {
+    setItems((prevItems) => [review, ...prevItems]);
+  };
+
   useEffect(() => {
     handleLoad({
       order,
@@ -71,7 +75,7 @@ function App() {
         <button onClick={handleNewestClick}>최신순</button>
         <button onClick={handleKCalClick}>칼로리순</button>
       </div>
-      <Foodform />
+      <Foodform onSubmitSuccess={handleSubmitSuccess} />
       <form onSubmit={handleSearchSubmit}>
         <input name="search" />
         <button type="submit">검색</button>
