@@ -2,8 +2,25 @@ import FoodList from "./FoodList";
 import { useEffect, useState } from "react";
 import { createFood, deleteFood, getFoods, updateFood } from "../api";
 import Foodform from "./Foodform";
-import { LocaleProvider } from "../contexts/LocaleContext";
 import LocaleSelect from "./LocaleSelect";
+import backgroundImg from "../assets/background.png";
+import logoImg from "../assets/logo.png";
+import searchImg from "../assets/ic-search.png";
+import useTranslate from "../hooks/useTranslate";
+import logoTextImg from "../assets/logo-text.png";
+import "./App.css";
+
+function AppSortButton({ selected, children, onClick }) {
+  return (
+    <button
+      disabled={selected}
+      className={`AppSortButton ${selected ? "selected" : ""}`}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
 
 function App() {
   const [items, setItems] = useState([]);
@@ -12,6 +29,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(null);
   const [search, setSearch] = useState("");
+
+  const t = useTranslate();
 
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
 
@@ -86,32 +105,67 @@ function App() {
   }, [order, search]);
 
   return (
-    <LocaleProvider defaultValue={"ko"}>
-      <div>
-        <LocaleSelect />
-        <div>
-          <button onClick={handleNewestClick}>최신순</button>
-          <button onClick={handleKCalClick}>칼로리순</button>
+    <div className="App" style={{ backgroundImage: `url("${backgroundImg}")` }}>
+      <div className="App-nav">
+        <img src={logoImg} alt="Foodit" />
+      </div>
+      <div className="App-container">
+        <div className="App-FoodForm">
+          <Foodform
+            onSubmit={createFood}
+            onSubmitSuccess={handleCreateSuccess}
+          />
         </div>
-        <Foodform onSubmit={createFood} onSubmitSuccess={handleCreateSuccess} />
-        <form onSubmit={handleSearchSubmit}>
-          <input name="search" />
-          <button type="submit">검색</button>
-        </form>
+        <div className="App-filter">
+          <form className="App-search" onSubmit={handleSearchSubmit}>
+            <input className="App-search-input" name="search" />
+            <button className="App-search-button" type="submit">
+              <img src={searchImg} alt="검색" />{" "}
+            </button>
+          </form>
+          <div className="App-orders">
+            <AppSortButton
+              selected={order === "createdAt"}
+              onClick={handleNewestClick}
+            >
+              {t("newest")}
+            </AppSortButton>
+            <AppSortButton
+              selected={order === "calorie"}
+              onClick={handleKCalClick}
+            >
+              {t("sort by calorie")}
+            </AppSortButton>
+          </div>
+        </div>
         <FoodList
+          className="App-FoodList"
           items={sortedItems}
           onDelete={handleDelete}
           onUpdate={updateFood}
           onUpdateSuccess={handleUpdateSuccess}
         />
         {cursor && (
-          <button disabled={isLoading} onClick={handleLoadMore}>
-            더 보기
+          <button
+            className="App-load-more-button"
+            disabled={isLoading}
+            onClick={handleLoadMore}
+          >
+            {t("load more")}
           </button>
         )}
         {loadingError?.message && <span>{loadingError.message}</span>}
       </div>
-    </LocaleProvider>
+      <div className="App-footer">
+        <div className="App-footer-container">
+          <img src={logoTextImg} alt="Foodit" />
+          <LocaleSelect />
+          <div className="App-footer-menu">
+            {t("terms of service")} | {t(`privacy policy`)}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
